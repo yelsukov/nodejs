@@ -5,23 +5,18 @@ const app = express();
 app.use(cors());
 
 app.get('/2b', (req, res) => {
-    var result = [],
+    let result = [],
         fullname = (req.query.fullname || '').trim(),
         validationRegex = /^([^-\s0-9`~!@#$%^&*()_=+\\|\[\]{};:",.<>\/?]+[\s]*){1,3}$/;
 
     if(validationRegex.test(fullname)) {
-        fullname = fullname
-            .replace(/'/g, '').replace(/[\s\t\n\r]+/g, ' ')
-            .split(' ')
-            .map(v => {
-                return v.slice(0, 1).toUpperCase() + v.slice(1).toLowerCase();
-            });
+        result = fullname
+            .split(/\s+/)
+            .map(v => v[0].toUpperCase() + v.slice(1).toLowerCase());
 
-        result.push(fullname.pop());
-
-        while(fullname.length) {
-            result.push(fullname.shift().substring(0,1).toUpperCase() + ".");
-        }
+        let part = result.pop();
+        result = result.map(v => v[0] + ".");
+        result.unshift(part);
     }
 
     res.send(result.length ? result.join(" ") : "Invalid fullname");
