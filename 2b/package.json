@@ -1,0 +1,31 @@
+{
+  "name": "2b",
+  "version": "1.0.0",
+  "description": "Study nodejs, issue 2b",
+  "main": "index.js",
+  "author": "Yelsukov Nikolay",
+  "license": "ISC",
+
+  "babel": {
+    "presets": [
+      "latest",
+      "stage-0"
+    ]
+  },
+
+  "dependencies": {
+    "cors": "^2.8.1",
+    "express": "^4.14.0"
+  },
+
+  "devDependencies": {
+    "babel-core": "^6.17.0",
+    "babel-preset-latest": "^6.16.0",
+    "babel-preset-stage-0": "^6.16.0",
+    "nodemon": "^1.11.0"
+  },
+
+  "scripts": {
+    "dev": "nodemon --exec babel-node -- index.js"
+  }
+}
