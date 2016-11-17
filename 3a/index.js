@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import mongodb from 'mongodb'
 
-
 import populateStructure from './middlewares/populateStructure';
 
 const app = express();
@@ -27,15 +26,16 @@ const unpackValue = function (data, parts) {
 const getStructurePart = async function (params) {
     let db = await mongodb.MongoClient.connect('mongodb://localhost:27017/study');
 
-    let fields = {_id: false},
-        parts = params.replace(/^\/|\/$/, "");
+    let query = {}, fields = {_id: false},
+        parts = params.replace(/^\/|\/$/g, "");
 
     if (parts) {
         parts = parts.split('/');
-        fields[parts.join('.')] = true;
+        fields[parts[0]] = true;
+        query[parts.join(".")] = {$exists: true};
     }
 
-    let result = await db.collection("structure").findOne({}, fields);
+    let result = (await db.collection("structure").find(query, fields).toArray()).pop();
     if (result && parts) {
         result = unpackValue(result, parts)
     }
@@ -65,14 +65,13 @@ app.get('/volumes', async(req, res) => {
 });
 
 app.get(/.+?/, async(req, res) => {
-    let result = await getStructurePart(req.url.substring(1)),
-        code = 200;
+    let result = await getStructurePart(req.url);
 
-    if (result === undefined) {
-        result = "Not found";
-        code = 404;
+    if (result !== undefined) {
+        res.status(200).json(result);
+    } else {
+        res.status(404).send("Not Found");
     }
-    res.status(code).json(result);
 
 });
 
@@ -80,3 +79,6 @@ app.get(/.+?/, async(req, res) => {
 app.listen(3000, () => {
     console.log('Server started on port 3000');
 });
+
+
+// TODO: code optimization
